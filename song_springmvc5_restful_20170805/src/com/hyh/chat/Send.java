@@ -6,23 +6,26 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Send implements Runnable{
+public class Send implements Runnable {
 
 	private Socket socket;
-	
-	public Send( Socket socket ) {
+
+	public Send(Socket socket) {
 		this.socket = socket;
 	}
-	
+
 	@Override
 	public void run() {
-		BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		PrintWriter writer;
 		try {
-			String msg = in.readLine();
-			PrintWriter writer = new PrintWriter( socket.getOutputStream() );
-			while( msg != null ) {
-				writer.println( msg );
-				if( msg.equals( "88" ) ) {
+			writer = new PrintWriter(socket.getOutputStream(), true);
+			String msg;
+			while ((msg = input.readLine()) != null) {
+//			String msg = input.readLine();
+//			while (msg.equals(null)) {
+				writer.println(msg);
+				if (msg.equals("88")) {
 					System.exit(0);
 				}
 			}

@@ -15,12 +15,17 @@ public class Recevie implements Runnable {
 
 	@Override
 	public void run() {
+		BufferedReader reader;
 		try {
-			BufferedReader read = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String msg = read.readLine();
-			if (msg != null) {
-				System.out.println(msg);
+			 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String msg = null;
+			while(true) {
+				msg = reader.readLine();
+				if (msg != null) {
+					System.out.println(msg);
+				}
 			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

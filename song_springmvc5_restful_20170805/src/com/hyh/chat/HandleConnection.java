@@ -19,41 +19,43 @@ public class HandleConnection implements Runnable {
 
 	@Override
 	public void run() {
-		PrintWriter write;
-		BufferedReader read;
+		connectToClient();
+	}
+
+	private void connectToClient() {
+		PrintWriter writer;
+		BufferedReader reader;
 		try {
-			read = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			// 自动清空缓存
-			write = new PrintWriter(socket.getOutputStream(), true);
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			// true : 自动清空缓存区数据
+			writer = new PrintWriter(socket.getOutputStream(), true);
 			while (true) {
-				String msg = read.readLine();
+				String msg = reader.readLine();
 				if (msg.equals("88")) {
 					this.socket.close();
 				}
-				System.out.println("recevie message : " + msg);
-				// 把数据发送给所有连服务器的客户端
+				System.out.println("recevie message: " + msg);
+				// 把数据发送给所有连接到服务器端的客户端
 				sendClient(msg);
 			}
+		} catch (Exception e) {
+			System.out.println("已经下线.........");
+		}
+	}
 
+	public void sendClient(String msg) {
+		PrintWriter writer;
+		try {
+			for (Socket s : sockets) {
+				if( s != this.socket ) {
+					writer = new PrintWriter(s.getOutputStream(), true);
+					writer.println(msg);
+				}
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-	}
-
-	public void sendClient(String msg) {
-		PrintWriter write;
-		for (Socket s : sockets) {
-			try {
-				write = new PrintWriter(s.getOutputStream(), true);
-				write.println(msg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
 	}
 
 }
