@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyh.dao.ToyMapper">
+
+	<!-- 定义结果集 -->
+	<resultMap type="com.hyh.pojo.Toy" id="toy-result">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="price" column="price" />
+		<result property="createDate" column="create_date" />
+	</resultMap>
+
+	<!-- 开始查询 -->
+	<!-- 1、条件语句 -->
+	<sql id="whereCase">
+		<where>
+			1=1
+			<if test="name != null and name != ''">
+				and name like CONCAT(CONCAT('%',#{name}),'%')
+			</if>
+			<if test="beginDate != null and endDate != null">
+				and date_format( create_date, '%Y-%m-%d' )
+				BETWEEN DATE_FORMAT(#{beginDate},'%Y-%m-%d') and
+				DATE_FORMAT(#{endDate},'%Y-%m-%d')
+			</if>
+		</where>
+	</sql>
+	<!-- 排序语句 -->
+	<sql id="orderBy">
+		order by 
+		<choose>
+			<when test="sort == name">name</when>
+			<when test="sort == price">price</when>
+			<when test="sort == createDate">createDate</when>
+			<otherwise>id</otherwise>
+		</choose>
+		
+		<if test="order == asc">asc</if>
+		<if test="order == desc">desc</if>
+	</sql>
+	
+	<!-- 模糊分页查询 -->
+	<select id="findPager" resultMap="toy-result">
+		select * from toy
+		inner join(
+		select id from toy 
+		<include refid="whereCase"/>
+		<include refid="orderBy"/>
+		limit #{page},#{rows}
+		) as lim using(id)
+	</select>
+	
+	<!-- 获得总记录数 -->
+	<select id="getTotal">
+		select count(*) from toy
+		<include refid="whereCase"/>
+	</select>
+	
+	<!-- 模糊查询 -->
+	<select id="findParam" resultMap="toy-result">
+		select * from toy 
+		<include refid="whereCase"/>
+	</select>
+
+	<!-- 根据 id 查询 -->
+	<select id="findById" resultMap="toy-result">
+		select * from toy where id=#{id}
+	</select>
+	
+	<!-- 查所有 -->
+	<select id="find" resultMap="toy-result">
+		select * from toy
+	</select>
+
+</mapper>
